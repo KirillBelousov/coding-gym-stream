@@ -209,7 +209,5 @@ public class TestPosts {
             PODCAST_8_DUPLICATE, PODCAST_9_DUPLICATE);
 
     // Собрать посты из BLOGS, INTERVIEWS, PODCASTS в один список.
-    public static List<Post> POSTS = Stream.of(BLOGS, INTERVIEWS, PODCASTS)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
+    public static List<Post> POSTS =
 }
