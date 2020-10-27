@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static codinggym.stream.TestPosts.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,7 +23,10 @@ public class ProblemsTest {
         List<Post> expected = Arrays.asList(BLOG_3, BLOG_6, BLOG_8);
 
         // Solution
-        List<Post> result =
+        List<Post> result = POSTS.stream()
+                .filter(post -> post.getLikes() > 500 && post.getDate().isAfter(NOW.minusMonths(3)))
+                .sorted(Comparator.comparing(Post::getDate).reversed())
+                .collect(Collectors.toList());
 
         // Check
         assertEquals(expected, result);
@@ -39,7 +43,8 @@ public class ProblemsTest {
         Predicate<Post> isTitleBlank = bp -> bp.getTitle().trim().isEmpty();
         Predicate<Post> isUrlEpam = bp -> "www.epam.com".equalsIgnoreCase(bp.getUrl().getHost());
 
-        boolean result =
+        boolean result = POSTS.stream()
+                .allMatch(isTitleNull.negate().and(isTitleBlank.negate()).and(isUrlEpam));
 
         // Check
         assertTrue(result);
@@ -54,7 +59,11 @@ public class ProblemsTest {
                 Set.of(PODCAST_9_DUPLICATE, PODCAST_8_DUPLICATE));
 
         // Solution
-        Map<String, Set<Post>> result =
+        Map<String, Set<Post>> result = POSTS.stream()
+                .collect(Collectors.groupingBy(Post::getUrl, Collectors.toSet()))
+                .entrySet().stream()
+                .filter(entry -> entry.getValue().size() > 1)
+                .collect(Collectors.toMap(entry -> entry.getKey().toString(), entry -> entry.getValue()));
 
         // Check
         assertEquals(expected, result);
@@ -86,7 +95,13 @@ public class ProblemsTest {
         List<Post> expected = Arrays.asList(PODCAST_8_DUPLICATE, BLOG_2, PODCAST_5);
 
         // Solution
-        List<Post> result =
+        List<Post> result = POSTS.stream()
+                .sorted(Comparator.comparing(Post::getLikes))
+                .limit(3)
+                .peek(post -> post.setLikes(post.getLikes() + 100))
+                .collect(Collectors.toList());
+
+        result.forEach(post -> post.setLikes(post.getLikes() - 100));
 
         // Check
         assertEquals(expected, result);
@@ -99,7 +114,9 @@ public class ProblemsTest {
         Post expected = PODCAST_9_DUPLICATE;
 
         // Solution
-        Post result =
+        Post result = POSTS.stream()
+                .reduce((accumulator, next) -> next)
+                .orElseThrow();
 
         // Check
         assertEquals(expected, result);
@@ -136,7 +153,8 @@ public class ProblemsTest {
                 PostType.PODCAST, 2623);
 
         // Solution
-        Map<PostType, Integer> result =
+        Map<PostType, Integer> result = POSTS.stream()
+                .collect(Collectors.groupingBy(Post::getType, () -> new EnumMap<>(PostType.class), Collectors.summingInt(Post::getLikes)));
 
         // Check
         assertEquals(expected, result);
@@ -150,7 +168,7 @@ public class ProblemsTest {
         Map<String, Post> expected = Map.of("Ken Gordon", PODCAST_9_DUPLICATE, "Jitin Agarwal", PODCAST_3);
 
         // Solution
-        Map<String, Post> result =
+        Map<String, Post> result = null;
 
         // Check
         assertEquals(expected, result);
@@ -164,7 +182,7 @@ public class ProblemsTest {
         Set<String> expected = new HashSet<>(Arrays.asList("Patrick Allen", "Dmitry Krasovskiy"));
 
         // Solution
-        Set<String> result =
+        Set<String> result = null;
 
         // Check
         assertEquals(expected, result);
